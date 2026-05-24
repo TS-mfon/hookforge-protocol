@@ -9,5 +9,5 @@ if [[ -z "${HOOKFORGE_VERCEL_TOKEN:-}" ]]; then
   exit 1
 fi
 
-cd "$ROOT/apps/web"
+cd "$ROOT"
 npx vercel --yes --prod --token "$HOOKFORGE_VERCEL_TOKEN"
