@@ -1,0 +1,17 @@
+{
+  "name": "@hookforge/simulator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@hookforge/shared": "1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

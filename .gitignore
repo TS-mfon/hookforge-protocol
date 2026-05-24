@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+dist
+cache
+broadcast
+coverage
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+apps/web/.vercel
+.vercel
+contracts/out
+contracts/cache
+contracts/broadcast

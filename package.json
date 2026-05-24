@@ -1,0 +1,24 @@
+{
+  "name": "hookforge-protocol",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @hookforge/web",
+    "build": "npm run build -w @hookforge/shared && npm run build -w @hookforge/web",
+    "lint": "npm run lint -w @hookforge/web",
+    "typecheck": "npm run typecheck -w @hookforge/shared && npm run typecheck -w @hookforge/web && npm run typecheck -w @hookforge/indexer && npm run typecheck -w @hookforge/ai-engine && npm run typecheck -w @hookforge/simulator",
+    "contracts:build": "forge build --root contracts",
+    "contracts:test": "forge test --root contracts",
+    "test": "npm run typecheck && npm run contracts:test",
+    "deploy:vercel": "bash scripts/deploy-vercel.sh",
+    "push:github": "bash scripts/push-github.sh"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
