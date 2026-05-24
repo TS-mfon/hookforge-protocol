@@ -25,3 +25,4 @@ read_env_value() {
 export HOOKFORGE_GITHUB_TOKEN="${GITHUB_TOKEN:-$(read_env_value github)}"
 export HOOKFORGE_VERCEL_TOKEN="${VERCEL_TOKEN:-$(read_env_value vercel)}"
 export HOOKFORGE_GITHUB_PRIVATE="${GITHUB_PRIVATE:-false}"
+export HOOKFORGE_VERCEL_SCOPE="${VERCEL_SCOPE:-gen-daves-projects}"

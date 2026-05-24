@@ -10,4 +10,4 @@ if [[ -z "${HOOKFORGE_VERCEL_TOKEN:-}" ]]; then
 fi
 
 cd "$ROOT"
-npx vercel --yes --prod --token "$HOOKFORGE_VERCEL_TOKEN"
+npx vercel --yes --prod --scope "$HOOKFORGE_VERCEL_SCOPE" --token "$HOOKFORGE_VERCEL_TOKEN"
