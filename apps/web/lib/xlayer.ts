@@ -37,6 +37,10 @@ export const MODULES = [
 
 export const HOOKFORGE_POOL_ID = "0x22222019d01322b7830e1d6572d2d9478cdab7c78471fa6b31eb73673595b244";
 export const DEPLOYMENT_BLOCK = 60929800n;
+const VERIFIED_ACTIVITY_TXS = [
+  "0x6a3b48fd0462f9e9f5bcde3208bbbb71e92a6a37cea98fa0c3363b8f62f7628f",
+  "0x25b1767005e11a65b5802ea14b973e35b6142866949a8bf72f59d1110aeb0aee"
+];
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const EVENT_TOPICS: Record<string, string> = {
@@ -79,6 +83,15 @@ export type ActivityEvent = {
   actor?: string;
   poolId?: string;
   value?: string;
+};
+
+type RpcLog = {
+  address: string;
+  topics: string[];
+  data: string;
+  blockNumber: string;
+  transactionHash: string;
+  logIndex: string;
 };
 
 export type TerminalState = {
@@ -237,17 +250,28 @@ export async function getHookDeployment(): Promise<HookDeployment> {
 export async function getActivity(limit = 25): Promise<ActivityEvent[]> {
   const latestHex = await rpc<string>("eth_blockNumber", [], 8);
   const latest = BigInt(latestHex);
-  const from = latest > DEPLOYMENT_BLOCK ? DEPLOYMENT_BLOCK : latest - 5000n;
+  const from = latest > 99n ? latest - 99n : 0n;
   const addresses = [CONTRACTS.hookKernel, CONTRACTS.stateManager, ...MODULES.map((item) => item.address)];
-  const logs = await rpc<Array<{ address: string; topics: string[]; data: string; blockNumber: string; transactionHash: string; logIndex: string }>>("eth_getLogs", [{
+  const recentLogs = await Promise.all(addresses.map((address) => rpc<RpcLog[]>("eth_getLogs", [{
     fromBlock: toHex(from),
     toBlock: "latest",
-    address: addresses
-  }], 8);
+    address
+  }], 8).catch(() => [])));
+  const receiptLogs = await Promise.all(VERIFIED_ACTIVITY_TXS.map(async (hash) => {
+    const receipt = await rpc<{ logs?: RpcLog[] } | null>("eth_getTransactionReceipt", [hash], 120).catch(() => null);
+    return receipt?.logs ?? [];
+  }));
+  const seen = new Set<string>();
 
-  return logs
+  return [...recentLogs.flat(), ...receiptLogs.flat()]
     .map((log) => decodeActivity(log))
     .filter((item): item is ActivityEvent => Boolean(item))
+    .filter((item) => {
+      const key = `${item.txHash}-${item.logIndex}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .sort((a, b) => b.blockNumber - a.blockNumber || b.logIndex - a.logIndex)
     .slice(0, limit);
 }
