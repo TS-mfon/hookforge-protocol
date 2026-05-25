@@ -1,40 +1,41 @@
 import { notFound } from "next/navigation";
-import { modules } from "@hookforge/shared";
 import { Metric, PageShell, Panel } from "@/components/ui";
+import { explorerAddress, getTerminalState, MODULES } from "@/lib/xlayer";
 
 export function generateStaticParams() {
-  return modules.map((module) => ({ slug: module.key }));
+  return MODULES.map((module) => ({ slug: module.key }));
 }
 
 export default async function ModulePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const module = modules.find((item) => item.key === slug);
+  const state = await getTerminalState();
+  const module = state.modules.find((item) => item.key === slug);
   if (!module) notFound();
+  const events = state.activity.filter((event) => event.contract.toLowerCase() === module.address.toLowerCase());
+
   return (
-    <PageShell eyebrow="HookForge Module" title={module.title} copy={module.description}>
+    <PageShell eyebrow="Live Module" title={module.title} copy={module.role}>
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <Panel>
-          <p className="text-xl text-forge-green">{module.tagline}</p>
-          <div className="mt-6 grid gap-3">
-            <Metric label="Execution" value="Kernel routed" />
-            <Metric label="Autonomy" value="Bounded" tone="green" />
-            <Metric label="Safety" value="Capped" tone="amber" />
+          <div className="grid gap-3">
+            <Metric label="Bytecode" value={module.hasCode ? "deployed" : "missing"} tone={module.hasCode ? "green" : "red"} />
+            <Metric label="Registry" value={module.enabled ? "enabled" : "not enabled"} tone={module.enabled ? "green" : "amber"} />
+            <Metric label="Gas Limit" value={module.gasLimit || "not read"} tone="amber" />
+            <Metric label="Order" value={module.order} />
+          </div>
+          <a href={explorerAddress(module.address)} target="_blank" className="mt-5 block break-all rounded border border-white/10 bg-black/24 p-3 font-mono text-xs text-forge-cyan">{module.address}</a>
+        </Panel>
+        <Panel>
+          <h2 className="mb-5 text-xl font-semibold text-white">Module events</h2>
+          <div className="space-y-3">
+            {events.length ? events.map((event) => (
+              <div key={`${event.txHash}-${event.logIndex}`} className="rounded border border-white/10 bg-black/24 p-4">
+                <p className="font-semibold text-white">{event.name}</p>
+                <p className="mt-2 text-sm text-white/52">Block {event.blockNumber}{event.value ? ` - ${event.value}` : ""}</p>
+              </div>
+            )) : <p className="text-sm text-white/54">No module-specific events indexed yet. Run a related hook action in Demo Lab to create activity.</p>}
           </div>
         </Panel>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Panel>
-            <h2 className="mb-4 text-lg font-semibold text-white">Metrics</h2>
-            {module.metrics.map((item) => <p key={item} className="border-b border-white/10 py-3 text-sm text-white/62">{item}</p>)}
-          </Panel>
-          <Panel>
-            <h2 className="mb-4 text-lg font-semibold text-white">Actions</h2>
-            {module.actions.map((item) => <p key={item} className="border-b border-white/10 py-3 text-sm text-white/62">{item}</p>)}
-          </Panel>
-          <Panel>
-            <h2 className="mb-4 text-lg font-semibold text-white">Guardrails</h2>
-            {module.guardrails.map((item) => <p key={item} className="border-b border-white/10 py-3 text-sm text-white/62">{item}</p>)}
-          </Panel>
-        </div>
       </div>
     </PageShell>
   );

@@ -1,36 +1,36 @@
 import { notFound } from "next/navigation";
-import { agents, recommendations } from "@hookforge/shared";
-import { Metric, PageShell, Panel, SafetyList } from "@/components/ui";
+import { ContractActions } from "@/components/contract-actions";
+import { Metric, PageShell, Panel } from "@/components/ui";
+import { getTerminalState } from "@/lib/xlayer";
 
 export function generateStaticParams() {
-  return agents.map((agent) => ({ agent: agent.key }));
+  return [{ agent: "mev-defense" }, { agent: "volatility" }, { agent: "liquidity" }];
 }
 
 export default async function AgentPage({ params }: { params: Promise<{ agent: string }> }) {
   const { agent: key } = await params;
-  const agent = agents.find((item) => item.key === key);
+  const state = await getTerminalState();
+  const agent = state.agents.find((item) => item.key === key);
   if (!agent) notFound();
-  const recs = recommendations.filter((rec) => rec.agent === agent.key);
   return (
-    <PageShell eyebrow="AI Agent" title={agent.name} copy={agent.role}>
+    <PageShell eyebrow="Agent" title={agent.name} copy={agent.action}>
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <Panel>
-          <Metric label="Confidence" value={`${agent.confidence}%`} />
-          <p className="mt-5 text-sm leading-6 text-white/58">{agent.lastAction}</p>
+          <Metric label="Mode" value={agent.mode} />
+          <Metric label="Status" value={agent.status} tone={agent.status === "ready" ? "green" : "amber"} />
+          <Metric label="OKB Balance" value={agent.balanceOkb ?? "not configured"} tone="amber" />
+          <p className="mt-5 break-all font-mono text-xs text-white/46">{agent.wallet ?? "No server wallet configured for this agent."}</p>
         </Panel>
         <Panel>
-          <h2 className="mb-5 text-xl font-semibold text-white">Signed Recommendations</h2>
-          <div className="space-y-3">
-            {recs.length ? recs.map((rec) => (
-              <div key={rec.id} className="rounded border border-white/10 bg-black/24 p-4">
-                <p className="font-semibold text-white">{rec.title}</p>
-                <p className="mt-2 text-sm text-white/56">{rec.rationale}</p>
-              </div>
-            )) : <p className="text-white/54">No active recommendation. Agent is monitoring.</p>}
+          <h2 className="mb-5 text-xl font-semibold text-white">Real use</h2>
+          <p className="text-sm leading-6 text-white/60">
+            This agent is useful when it submits bounded HookKernel actions, records tx receipts, and changes pool metrics. If no server wallet is configured, a connected user can run the same action manually below.
+          </p>
+          <div className="mt-5">
+            <ContractActions hookAddress={state.deployment.hookAddress} />
           </div>
         </Panel>
       </div>
-      <div className="mt-6"><SafetyList /></div>
     </PageShell>
   );
 }

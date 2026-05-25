@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Activity, Bot, Boxes, FlaskConical, Home, Layers3, Shield, Swords, Trophy } from "lucide-react";
+import { Activity, Bot, Boxes, CandlestickChart, FlaskConical, Home, Layers3, Shield, Swords, Trophy } from "lucide-react";
 import { WalletButton } from "@/components/wallet-button";
 import { getHookDeployment } from "@/lib/xlayer";
 import "./globals.css";
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 const nav = [
   { href: "/", label: "Home", icon: Home },
   { href: "/dashboard", label: "Command", icon: Activity },
+  { href: "/trade", label: "Trade", icon: CandlestickChart },
   { href: "/pools", label: "Pools", icon: Layers3 },
   { href: "/studio", label: "Studio", icon: Boxes },
   { href: "/modules", label: "Modules", icon: Shield },
