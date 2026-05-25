@@ -1,7 +1,11 @@
 import { modules } from "@hookforge/shared";
 import { PageShell, Panel, SafetyList } from "@/components/ui";
+import { ContractActions } from "@/components/contract-actions";
+import { getHookDeployment } from "@/lib/xlayer";
 
-export default function StudioPage() {
+export default async function StudioPage() {
+  const deployment = await getHookDeployment();
+
   return (
     <PageShell eyebrow="HookForge Studio" title="No-code adaptive pool builder" copy="Compose modules, configure caps, preview behavior, and generate deployable pool configuration for programmable markets.">
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -20,6 +24,9 @@ export default function StudioPage() {
           <h2 className="mb-5 text-xl font-semibold text-white">Safety Envelope</h2>
           <SafetyList />
         </Panel>
+      </div>
+      <div className="mt-6">
+        <ContractActions hookAddress={deployment.hookAddress} />
       </div>
     </PageShell>
   );
