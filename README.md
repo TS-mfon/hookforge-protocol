@@ -45,49 +45,71 @@ The deployer loaded from `buildenv/.env` resolves to:
 0xEd9EDd8586b20524CafA4F568413C504C9B03172
 ```
 
-Current deployment simulations on X Layer mainnet:
+Current deployment on X Layer mainnet:
 
 ```text
-DeployCore.s.sol      4,093,072 gas  requires about 0.000163722884093072 OKB
-DeployModules.s.sol   run after core with HOOKFORGE_MODULE_REGISTRY_ADDRESS set
-Deploy.s.sol          10,449,117 gas requires about 0.000417964690449117 OKB
-DeployXLayerHook.s.sol 1,897,142 gas requires about 0.000075885681897142 OKB
+PoolStateManager      0x20e312df00bffd3a4270e4efa0d396d2d0afe603
+ModuleRegistry        0x4fe350f97542911ddc95ceb09510f61de05068d9
+ParameterManager      0x0f36aa1064cf545eb435e33e4f23dec098362e7c
+EmergencyController   0x73784e99c0e183499da4d3e8002cbd6fdadc36b2
+HookKernel            0x622857b0fef3fc2adbed986194ab74eb624de5f7
 ```
 
-The deployer balance checked during implementation was:
+Core deployment transaction hashes:
 
 ```text
-0.000037794755245125 OKB
+PoolStateManager      0xfe5e315c76660fc8eb2354402c1713906e8600819acfb92806679f3e682fbb60
+ModuleRegistry        0x9e7d413b48d2b22b822c8780360730493dfc8df7f5d8872efb2004c01a1e14ef
+ParameterManager      0xb0034fefab223743504e5ce898018e86dc210911319af05ebc5ae8d7872a7926
+EmergencyController   0xa70d4ce96084258afef04a8698a522350c87929ed6d20a124927e2f9cdf9dfe9
+HookKernel            0x5ea0789946213c0f466fc2c366295df0f488f43504c80d40dc95f354e97b4c4e
+StateManager.setKernel 0x1d182692c4fbf8afaf562df35cd600b4ea295aa2c12dab67f24fd0a5f08c2226
 ```
 
-That balance is below the core deployment requirement and below the compact hook deployment requirement. The main contracts were simulated successfully but were not broadcast because the current balance would fail before completion and would leave no reserve for module deployment, agents, or site testing.
-
-Recommended funding before broadcast:
+Deployed and configured modules:
 
 ```text
-Minimum for core only:       0.00020 OKB
-Recommended core + modules:  0.00055 OKB
-Recommended with agents/tests reserve: 0.00075 OKB or more
+DynamicFeeModule      0x7a2330a935b617ec257d8acb9c59e45cc2019bf5
+AntiMEVModule         0x28696a881d57bc3ed88abe082a82934d8b82e893
+TWAPModule            0xdba3b21c243e21ad31a59cf1dc20840871a066f1
+RebalanceModule       0x8864ad5224738db9c8807b2796476a5cff960fc8
+SentimentModule       0x84ef06cc24f573de0de694dc9ada07a56491031f
+WhaleDefenseModule    0x67e043731d26a7d27c00bc3389f01162cb18007d
+RewardEngine          0x5246fa2a410715f772ce2aa680ab185b01c88896
+EvolutionEngine       0xabf1c35fa10b869685a819cfe6bb959bd6e2319b
+QuestEngine           0xc437583f16e613b524f6607d81b628c5e5274f39
+LPProfileEngine       0xcf08ca0e9db390fcd5b5ef417b8a6d190d2a7288
 ```
 
-Broadcast order:
+Onchain activity created for judge review:
 
-```bash
-source scripts/env.sh
-cd contracts
-forge script script/DeployCore.s.sol:DeployCore --rpc-url "$HOOKFORGE_XLAYER_RPC_URL" --private-key "$HOOKFORGE_DEPLOYER_PRIVATE_KEY" --broadcast
-
-export HOOKFORGE_MODULE_REGISTRY_ADDRESS=<registry-from-core-broadcast>
-forge script script/DeployModules.s.sol:DeployModules --rpc-url "$HOOKFORGE_XLAYER_RPC_URL" --private-key "$HOOKFORGE_DEPLOYER_PRIVATE_KEY" --broadcast
+```text
+afterSwap checkpoint   0x6a3b48fd0462f9e9f5bcde3208bbbb71e92a6a37cea98fa0c3363b8f62f7628f
+beforeSwap checkpoint  0x25b1767005e11a65b5802ea14b973e35b6142866949a8bf72f59d1110aeb0aee
 ```
 
-After deployment, set these Vercel environment variables and redeploy the site:
+Current X Layer pool metrics after test activity:
+
+```text
+poolId          0x22222019d01322b7830e1d6572d2d9478cdab7c78471fa6b31eb73673595b244
+riskScore       0
+feeMemory       0
+liquidityHealth 75
+volatility      0
+sentiment       0
+whalePressure   0
+questProgress   2
+dynamicFeeBps   20
+evolutionState  1
+```
+
+Vercel production environment:
 
 ```text
 NEXT_PUBLIC_XLAYER_RPC_URL=https://rpc.xlayer.tech
-NEXT_PUBLIC_HOOKFORGE_KERNEL_ADDRESS=<deployed-kernel-or-hook>
-NEXT_PUBLIC_HOOKFORGE_STATE_MANAGER_ADDRESS=<deployed-state-manager-if-using-core-stack>
-NEXT_PUBLIC_HOOKFORGE_MODULE_REGISTRY_ADDRESS=<deployed-registry-if-using-core-stack>
+NEXT_PUBLIC_HOOKFORGE_KERNEL_ADDRESS=0x622857b0fef3fc2adbed986194ab74eb624de5f7
+NEXT_PUBLIC_HOOKFORGE_STATE_MANAGER_ADDRESS=0x20e312df00bffd3a4270e4efa0d396d2d0afe603
+NEXT_PUBLIC_HOOKFORGE_MODULE_REGISTRY_ADDRESS=0x4fe350f97542911ddc95ceb09510f61de05068d9
 ```
 
 ## Safety Model

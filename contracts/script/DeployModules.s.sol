@@ -16,10 +16,10 @@ import {LPProfileEngine} from "../src/modules/LPProfileEngine.sol";
 
 contract DeployModules is Script {
     bytes32 internal constant XLAYER_WOKB_USDC_POOL_ID = keccak256("XLAYER:WOKB/USDC:HOOKFORGE");
+    address internal constant XLAYER_MODULE_REGISTRY = 0x4Fe350F97542911DDc95ceb09510f61de05068d9;
 
     function run() external {
-        address registryAddress = vm.envAddress("HOOKFORGE_MODULE_REGISTRY_ADDRESS");
-        ModuleRegistry registry = ModuleRegistry(registryAddress);
+        ModuleRegistry registry = ModuleRegistry(XLAYER_MODULE_REGISTRY);
 
         vm.startBroadcast();
         _enable(registry, address(new DynamicFeeModule()), 1);
@@ -40,4 +40,3 @@ contract DeployModules is Script {
         registry.configure(XLAYER_WOKB_USDC_POOL_ID, module, true, 300_000, order);
     }
 }
-
