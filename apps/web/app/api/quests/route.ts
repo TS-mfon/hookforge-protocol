@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getActivity, getHookDeployment } from "@/lib/xlayer";
 
 export async function GET() {
-  const [deployment, activity] = await Promise.all([getHookDeployment(), getActivity(50)]);
+  const [deployment, activity] = await Promise.all([getHookDeployment(), getActivity(50).catch(() => [])]);
   return NextResponse.json({
     quests: [{
       id: "wokb-usdc-activity",

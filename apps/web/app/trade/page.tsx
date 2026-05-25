@@ -2,6 +2,8 @@ import { ContractActions } from "@/components/contract-actions";
 import { EmptyState, LivePoolOrganism, Metric, PageShell, Panel } from "@/components/ui";
 import { getTerminalState, XLAYER } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function TradePage() {
   const state = await getTerminalState();
   const metrics = state.deployment.metrics;
@@ -27,4 +29,3 @@ export default async function TradePage() {
     </PageShell>
   );
 }
-

@@ -2,6 +2,8 @@ import { ContractActions } from "@/components/contract-actions";
 import { EmptyState, LivePoolOrganism, Metric, PageShell, Panel } from "@/components/ui";
 import { explorerAddress, explorerTx, getTerminalState, metricThreat } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const state = await getTerminalState();
   const metrics = state.deployment.metrics;

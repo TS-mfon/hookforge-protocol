@@ -3,6 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { LivePoolOrganism, Metric, PageShell, Panel } from "@/components/ui";
 import { CONTRACTS, explorerAddress, getTerminalState, metricThreat, XLAYER } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function PoolsPage() {
   const state = await getTerminalState();
   const metrics = state.deployment.metrics;

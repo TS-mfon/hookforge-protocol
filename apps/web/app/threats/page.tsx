@@ -2,6 +2,8 @@ import { ContractActions } from "@/components/contract-actions";
 import { Metric, PageShell, Panel } from "@/components/ui";
 import { getTerminalState, metricThreat } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function ThreatsPage() {
   const state = await getTerminalState();
   const metrics = state.deployment.metrics;

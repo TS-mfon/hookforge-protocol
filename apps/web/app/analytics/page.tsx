@@ -1,6 +1,8 @@
 import { EmptyState, Metric, PageShell, Panel } from "@/components/ui";
 import { explorerTx, getTerminalState } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function AnalyticsPage() {
   const state = await getTerminalState();
   const metrics = state.deployment.metrics;

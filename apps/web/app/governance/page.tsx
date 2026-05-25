@@ -1,6 +1,8 @@
 import { Metric, PageShell, Panel, SafetyList } from "@/components/ui";
 import { CONTRACTS, explorerAddress, getTerminalState } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function GovernancePage() {
   const state = await getTerminalState();
   return (

@@ -5,6 +5,8 @@ import { WalletButton } from "@/components/wallet-button";
 import { getHookDeployment } from "@/lib/xlayer";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "HookForge Protocol",
   description: "The Operating System for Adaptive Markets.",

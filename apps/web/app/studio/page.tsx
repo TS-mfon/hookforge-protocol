@@ -2,6 +2,8 @@ import { ContractActions } from "@/components/contract-actions";
 import { EmptyState, Metric, PageShell, Panel, SafetyList } from "@/components/ui";
 import { getTerminalState, XLAYER } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function StudioPage() {
   const state = await getTerminalState();
 

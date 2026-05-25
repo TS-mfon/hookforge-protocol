@@ -3,6 +3,8 @@ import { Cpu } from "lucide-react";
 import { PageShell, Panel } from "@/components/ui";
 import { explorerAddress, getTerminalState } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function ModulesPage() {
   const state = await getTerminalState();
   return (

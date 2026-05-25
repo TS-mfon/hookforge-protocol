@@ -2,9 +2,7 @@ import { notFound } from "next/navigation";
 import { Metric, PageShell, Panel } from "@/components/ui";
 import { explorerAddress, getTerminalState, MODULES } from "@/lib/xlayer";
 
-export function generateStaticParams() {
-  return MODULES.map((module) => ({ slug: module.key }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function ModulePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

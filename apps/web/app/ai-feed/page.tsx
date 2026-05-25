@@ -1,6 +1,8 @@
 import { EmptyState, PageShell, Panel } from "@/components/ui";
 import { explorerTx, getTerminalState } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function AIFeedPage() {
   const state = await getTerminalState();
   return (

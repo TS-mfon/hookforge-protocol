@@ -3,9 +3,7 @@ import { ContractActions } from "@/components/contract-actions";
 import { Metric, PageShell, Panel } from "@/components/ui";
 import { getTerminalState } from "@/lib/xlayer";
 
-export function generateStaticParams() {
-  return [{ agent: "mev-defense" }, { agent: "volatility" }, { agent: "liquidity" }];
-}
+export const dynamic = "force-dynamic";
 
 export default async function AgentPage({ params }: { params: Promise<{ agent: string }> }) {
   const { agent: key } = await params;

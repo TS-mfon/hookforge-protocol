@@ -4,6 +4,8 @@ import { HookStatus } from "@/components/hook-status";
 import { CTA, LivePoolOrganism, Metric, Panel, SecurityBadge } from "@/components/ui";
 import { explorerTx, getTerminalState, metricThreat } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const state = await getTerminalState();
   const metrics = state.deployment.metrics;

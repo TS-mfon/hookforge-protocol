@@ -3,9 +3,7 @@ import { ContractActions } from "@/components/contract-actions";
 import { EmptyState, LivePoolOrganism, Metric, PageShell, Panel } from "@/components/ui";
 import { explorerTx, getTerminalState, MODULES, XLAYER } from "@/lib/xlayer";
 
-export function generateStaticParams() {
-  return [{ id: "wokb-usdc" }];
-}
+export const dynamic = "force-dynamic";
 
 export default async function PoolDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

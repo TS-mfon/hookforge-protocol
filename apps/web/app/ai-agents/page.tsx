@@ -4,6 +4,8 @@ import { ContractActions } from "@/components/contract-actions";
 import { Metric, PageShell, Panel } from "@/components/ui";
 import { getTerminalState } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function AIAgentsPage() {
   const state = await getTerminalState();
   const ready = state.agents.filter((agent) => agent.status === "ready").length;

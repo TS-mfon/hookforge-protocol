@@ -2,6 +2,8 @@ import { ContractActions } from "@/components/contract-actions";
 import { EmptyState, Metric, PageShell, Panel } from "@/components/ui";
 import { getTerminalState } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function LpRpgPage() {
   const state = await getTerminalState();
   const lpEvents = state.activity.filter((event) => event.name.includes("Hook checkpoint 5") || event.name.includes("Hook checkpoint 7"));

@@ -2,6 +2,8 @@ import { ContractActions } from "@/components/contract-actions";
 import { EmptyState, LivePoolOrganism, Metric, PageShell, Panel } from "@/components/ui";
 import { explorerTx, getTerminalState } from "@/lib/xlayer";
 
+export const dynamic = "force-dynamic";
+
 export default async function DemoLabPage() {
   const state = await getTerminalState();
   const metrics = state.deployment.metrics;
