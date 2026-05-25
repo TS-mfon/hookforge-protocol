@@ -9,6 +9,27 @@ import {IHookForgeModule} from "./IHookForgeModule.sol";
 import {HookPoint, PoolMetrics, ModuleConfig} from "./Types.sol";
 
 contract HookKernel {
+    struct PoolKey {
+        address currency0;
+        address currency1;
+        uint24 fee;
+        int24 tickSpacing;
+        address hooks;
+    }
+
+    struct SwapParams {
+        bool zeroForOne;
+        int256 amountSpecified;
+        uint160 sqrtPriceLimitX96;
+    }
+
+    struct ModifyLiquidityParams {
+        int24 tickLower;
+        int24 tickUpper;
+        int256 liquidityDelta;
+        bytes32 salt;
+    }
+
     PoolStateManager public immutable stateManager;
     ModuleRegistry public immutable registry;
     ParameterManager public immutable parameters;
@@ -30,43 +51,117 @@ contract HookKernel {
         return _run(HookPoint.BeforeInitialize, poolId, msg.sender, data);
     }
 
+    function beforeInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96) external returns (bytes4) {
+        _run(HookPoint.BeforeInitialize, _poolId(key), sender, abi.encode(sqrtPriceX96));
+        return msg.sig;
+    }
+
     function afterInitialize(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.AfterInitialize, poolId, msg.sender, data);
+    }
+
+    function afterInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96, int24 tick) external returns (bytes4) {
+        _run(HookPoint.AfterInitialize, _poolId(key), sender, abi.encode(sqrtPriceX96, tick));
+        return msg.sig;
     }
 
     function beforeSwap(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.BeforeSwap, poolId, msg.sender, data);
     }
 
+    function beforeSwap(address sender, PoolKey calldata key, SwapParams calldata params, bytes calldata data)
+        external
+        returns (bytes4, int256, uint24)
+    {
+        PoolMetrics memory metrics = _run(HookPoint.BeforeSwap, _poolId(key), sender, abi.encode(params, data));
+        return (msg.sig, 0, metrics.dynamicFeeBps == 0 ? key.fee : metrics.dynamicFeeBps * 100);
+    }
+
     function afterSwap(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.AfterSwap, poolId, msg.sender, data);
+    }
+
+    function afterSwap(address sender, PoolKey calldata key, SwapParams calldata params, int256 delta, bytes calldata data)
+        external
+        returns (bytes4, int128)
+    {
+        _run(HookPoint.AfterSwap, _poolId(key), sender, abi.encode(params, delta, data));
+        return (msg.sig, 0);
     }
 
     function beforeAddLiquidity(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.BeforeAddLiquidity, poolId, msg.sender, data);
     }
 
+    function beforeAddLiquidity(address sender, PoolKey calldata key, ModifyLiquidityParams calldata params, bytes calldata data) external returns (bytes4) {
+        _run(HookPoint.BeforeAddLiquidity, _poolId(key), sender, abi.encode(params, data));
+        return msg.sig;
+    }
+
     function afterAddLiquidity(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.AfterAddLiquidity, poolId, msg.sender, data);
+    }
+
+    function afterAddLiquidity(
+        address sender,
+        PoolKey calldata key,
+        ModifyLiquidityParams calldata params,
+        int256 delta,
+        int256 feesAccrued,
+        bytes calldata data
+    ) external returns (bytes4, int256) {
+        _run(HookPoint.AfterAddLiquidity, _poolId(key), sender, abi.encode(params, delta, feesAccrued, data));
+        return (msg.sig, 0);
     }
 
     function beforeRemoveLiquidity(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.BeforeRemoveLiquidity, poolId, msg.sender, data);
     }
 
+    function beforeRemoveLiquidity(address sender, PoolKey calldata key, ModifyLiquidityParams calldata params, bytes calldata data) external returns (bytes4) {
+        _run(HookPoint.BeforeRemoveLiquidity, _poolId(key), sender, abi.encode(params, data));
+        return msg.sig;
+    }
+
     function afterRemoveLiquidity(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.AfterRemoveLiquidity, poolId, msg.sender, data);
+    }
+
+    function afterRemoveLiquidity(
+        address sender,
+        PoolKey calldata key,
+        ModifyLiquidityParams calldata params,
+        int256 delta,
+        int256 feesAccrued,
+        bytes calldata data
+    ) external returns (bytes4, int256) {
+        _run(HookPoint.AfterRemoveLiquidity, _poolId(key), sender, abi.encode(params, delta, feesAccrued, data));
+        return (msg.sig, 0);
     }
 
     function beforeDonate(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.BeforeDonate, poolId, msg.sender, data);
     }
 
+    function beforeDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1, bytes calldata data) external returns (bytes4) {
+        _run(HookPoint.BeforeDonate, _poolId(key), sender, abi.encode(amount0, amount1, data));
+        return msg.sig;
+    }
+
     function afterDonate(bytes32 poolId, bytes calldata data) external returns (PoolMetrics memory) {
         return _run(HookPoint.AfterDonate, poolId, msg.sender, data);
     }
 
-    function _run(HookPoint point, bytes32 poolId, address actor, bytes calldata data) internal returns (PoolMetrics memory metrics) {
+    function afterDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1, bytes calldata data) external returns (bytes4) {
+        _run(HookPoint.AfterDonate, _poolId(key), sender, abi.encode(amount0, amount1, data));
+        return msg.sig;
+    }
+
+    function xLayerPoolId() external pure returns (bytes32) {
+        return keccak256("XLAYER:WOKB/USDC:HOOKFORGE");
+    }
+
+    function _run(HookPoint point, bytes32 poolId, address actor, bytes memory data) internal returns (PoolMetrics memory metrics) {
         require(!emergency.protocolPaused(), "KERNEL_PROTOCOL_PAUSED");
         require(!emergency.poolPaused(poolId), "KERNEL_POOL_PAUSED");
 
@@ -106,5 +201,9 @@ contract HookKernel {
         if (metrics.questProgress > 100) metrics.questProgress = 100;
         if (metrics.evolutionState > 6) metrics.evolutionState = 6;
         return metrics;
+    }
+
+    function _poolId(PoolKey calldata key) internal pure returns (bytes32) {
+        return keccak256(abi.encode(key.currency0, key.currency1, key.fee, key.tickSpacing, key.hooks));
     }
 }

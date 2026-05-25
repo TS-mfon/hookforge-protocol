@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Activity, Bot, Boxes, FlaskConical, Home, Layers3, Shield, Swords, Trophy } from "lucide-react";
+import { WalletButton } from "@/components/wallet-button";
+import { getHookDeployment } from "@/lib/xlayer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,7 +26,9 @@ const nav = [
   { href: "/demo-lab", label: "Demo Lab", icon: FlaskConical }
 ];
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const deployment = await getHookDeployment();
+
   return (
     <html lang="en">
       <body>
@@ -51,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   );
                 })}
               </nav>
+              <WalletButton hookAddress={deployment.hookAddress} />
             </div>
           </header>
           {children}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, BrainCircuit, Layers3, ShieldCheck } from "lucide-react";
 import { modules, pools } from "@hookforge/shared";
+import { HookStatus } from "@/components/hook-status";
 import { CTA, ModuleCard, Panel, PoolCard, PoolOrganism, SecurityBadge, SystemStrip } from "@/components/ui";
 
 export default function HomePage() {
@@ -22,6 +23,10 @@ export default function HomePage() {
           <div className="mt-8"><CTA /></div>
         </div>
         <PoolOrganism pool={heroPool} large />
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-14">
+        <HookStatus />
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-14">
