@@ -259,12 +259,17 @@ export async function getHookDeployment(): Promise<HookDeployment> {
 export async function getActivity(limit = 25): Promise<ActivityEvent[]> {
   const latestHex = await rpc<string>("eth_blockNumber", [], 8);
   const latest = BigInt(latestHex);
-  const from = latest > 99n ? latest - 99n : 0n;
+  const scanStart = latest > 999n ? latest - 999n : 0n;
   const addresses = [CONTRACTS.hookKernel, CONTRACTS.stateManager, ...MODULES.map((item) => item.address)];
-  const recentLogs = await Promise.all(addresses.map((address) => rpc<RpcLog[]>("eth_getLogs", [{
-    fromBlock: toHex(from),
-    toBlock: "latest",
-    address
+  const windows: Array<{ fromBlock: string; toBlock: string }> = [];
+  for (let from = scanStart; from <= latest; from += 100n) {
+    const to = from + 99n > latest ? latest : from + 99n;
+    windows.push({ fromBlock: toHex(from), toBlock: toHex(to) });
+  }
+  const recentLogs = await Promise.all(windows.map((window) => rpc<RpcLog[]>("eth_getLogs", [{
+    fromBlock: window.fromBlock,
+    toBlock: window.toBlock,
+    address: addresses
   }], 8).catch(() => [])));
   const receiptLogs = await Promise.all(VERIFIED_ACTIVITY_TXS.map(async (hash) => {
     const receipt = await rpc<{ logs?: RpcLog[] } | null>("eth_getTransactionReceipt", [hash], 120).catch(() => null);
