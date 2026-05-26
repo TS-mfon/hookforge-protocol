@@ -121,16 +121,25 @@ export type AgentStatus = {
 };
 
 export async function rpc<T>(method: string, params: unknown[], _revalidate = 20): Promise<T> {
-  const response = await fetch(XLAYER.rpcUrl, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-    cache: "no-store"
-  });
-  if (!response.ok) throw new Error(`X Layer RPC returned ${response.status}`);
-  const payload = await response.json() as { result?: T; error?: { message?: string } };
-  if (payload.error) throw new Error(payload.error.message ?? "X Layer RPC error");
-  return payload.result as T;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await fetch(XLAYER.rpcUrl, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+        cache: "no-store"
+      });
+      if (!response.ok) throw new Error(`X Layer RPC returned ${response.status}`);
+      const payload = await response.json() as { result?: T; error?: { message?: string } };
+      if (payload.error) throw new Error(payload.error.message ?? "X Layer RPC error");
+      return payload.result as T;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("X Layer RPC error");
 }
 
 export function explorerAddress(address: string) {
