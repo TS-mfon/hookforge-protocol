@@ -301,12 +301,14 @@ export async function getAgents(): Promise<AgentStatus[]> {
   const configuredWallets = [
     envAddress("HOOKFORGE_AGENT_MEV_ADDRESS"),
     envAddress("HOOKFORGE_AGENT_VOLATILITY_ADDRESS"),
-    envAddress("HOOKFORGE_AGENT_LIQUIDITY_ADDRESS")
+    envAddress("HOOKFORGE_AGENT_LIQUIDITY_ADDRESS"),
+    envAddress("HOOKFORGE_AGENT_GROWTH_ADDRESS")
   ];
   const labels = [
     ["mev-defense", "MEV Defense Agent", "Runs beforeSwap checkpoints when toxic flow needs testing."],
     ["volatility", "Volatility Agent", "Runs swap stress checkpoints and records metric changes."],
-    ["liquidity", "Liquidity Agent", "Runs LP checkpoint scenarios and watches liquidity health."]
+    ["liquidity", "Liquidity Agent", "Runs LP checkpoint scenarios and watches liquidity health."],
+    ["growth", "Growth Agent", "Runs sentiment and quest checkpoints after adaptive swap activity."]
   ] as const;
   return Promise.all(labels.map(async ([key, name, action], index) => {
     const wallet = configuredWallets[index];

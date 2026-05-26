@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Bot } from "lucide-react";
+import { AgentRunner } from "@/components/agent-runner";
 import { ContractActions } from "@/components/contract-actions";
 import { Metric, PageShell, Panel } from "@/components/ui";
 import { getTerminalState } from "@/lib/xlayer";
@@ -10,7 +11,7 @@ export default async function AIAgentsPage() {
   const state = await getTerminalState();
   const ready = state.agents.filter((agent) => agent.status === "ready").length;
   return (
-    <PageShell eyebrow="Agents" title="Real agent activity layer" copy="Agents are not profile cards anymore. A server agent appears only if a wallet is configured and funded; otherwise users can manually run agent actions from their wallet.">
+    <PageShell eyebrow="Agents" title="Real agent activity layer" copy="Agents are transaction senders now: they submit bounded HookKernel actions, wait for X Layer receipts, and feed the same live state every page reads.">
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         <Metric label="Server Agents Ready" value={ready} tone={ready ? "green" : "amber"} />
         <Metric label="User Agent Mode" value="enabled" tone="green" />
@@ -32,12 +33,15 @@ export default async function AIAgentsPage() {
         ))}
       </div>
       <div className="mt-6">
+        <AgentRunner />
+      </div>
+      <div className="mt-6">
         <ContractActions hookAddress={state.deployment.hookAddress} />
       </div>
       <div className="mt-6">
         <Panel>
           <h2 className="mb-3 text-xl font-semibold text-white">Backend agent requirement</h2>
-          <p className="text-sm leading-6 text-white/60">To enable autonomous server agents, configure server-only agent private keys and fund their public wallets with OKB. Until then, the dApp correctly exposes manual user-agent actions and does not fake autonomous activity.</p>
+          <p className="text-sm leading-6 text-white/60">Server agents use private keys stored only in Vercel environment variables. Their tx hashes are returned by the API and then indexed back into the terminal feed from X Layer receipts.</p>
         </Panel>
       </div>
     </PageShell>

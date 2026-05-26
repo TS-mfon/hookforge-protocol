@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { AgentRunner } from "@/components/agent-runner";
 import { ContractActions } from "@/components/contract-actions";
 import { Metric, PageShell, Panel } from "@/components/ui";
 import { getTerminalState } from "@/lib/xlayer";
@@ -21,10 +22,9 @@ export default async function AgentPage({ params }: { params: Promise<{ agent: s
         </Panel>
         <Panel>
           <h2 className="mb-5 text-xl font-semibold text-white">Real use</h2>
-          <p className="text-sm leading-6 text-white/60">
-            This agent is useful when it submits bounded HookKernel actions, records tx receipts, and changes pool metrics. If no server wallet is configured, a connected user can run the same action manually below.
-          </p>
-          <div className="mt-5">
+          <p className="text-sm leading-6 text-white/60">This agent submits bounded HookKernel actions, waits for receipts, and changes the pool metrics that every page reads from X Layer.</p>
+          <div className="mt-5 grid gap-5">
+            <AgentRunner agent={agent.key} />
             <ContractActions hookAddress={state.deployment.hookAddress} />
           </div>
         </Panel>

@@ -9,7 +9,7 @@ This repository is a greenfield monorepo containing:
 - A modern Next.js dApp and landing page.
 - Solidity contracts for the Hook Kernel and modules.
 - Shared schemas for pool state, modules, AI agents, and demo scenarios.
-- Indexer, AI engine, and simulator service skeletons.
+- Live X Layer API routes for terminal state, activity, quests, modules, and agent execution.
 - Deployment scripts for GitHub and Vercel.
 
 ## Commands
@@ -88,6 +88,15 @@ afterSwap checkpoint   0x6a3b48fd0462f9e9f5bcde3208bbbb71e92a6a37cea98fa0c3363b8
 beforeSwap checkpoint  0x25b1767005e11a65b5802ea14b973e35b6142866949a8bf72f59d1110aeb0aee
 ```
 
+Funded server-agent wallets configured in Vercel production:
+
+```text
+MEV Defense Agent      0x7edAefb6cfaF03cE74e2A3f7D3860A90a325f316
+Volatility Agent       0x4595F50436C55824381D2530Fef941350aC1F6a2
+Liquidity Agent        0x509915128B3696F48707499C8786D0900FA6F606
+Growth Agent           0x9CEE7C9E40f2BF21C2C2A1715820bDf02af915be
+```
+
 Current X Layer pool metrics after test activity:
 
 ```text
@@ -98,7 +107,7 @@ liquidityHealth 75
 volatility      0
 sentiment       0
 whalePressure   0
-questProgress   2
+questProgress   4
 dynamicFeeBps   20
 evolutionState  1
 ```
@@ -110,7 +119,23 @@ NEXT_PUBLIC_XLAYER_RPC_URL=https://rpc.xlayer.tech
 NEXT_PUBLIC_HOOKFORGE_KERNEL_ADDRESS=0x622857b0fef3fc2adbed986194ab74eb624de5f7
 NEXT_PUBLIC_HOOKFORGE_STATE_MANAGER_ADDRESS=0x20e312df00bffd3a4270e4efa0d396d2d0afe603
 NEXT_PUBLIC_HOOKFORGE_MODULE_REGISTRY_ADDRESS=0x4fe350f97542911ddc95ceb09510f61de05068d9
+HOOKFORGE_AGENT_*_ADDRESS=<public agent address>
+HOOKFORGE_AGENT_*_PRIVATE_KEY=<server-only private key>
 ```
+
+## Live dApp Behavior
+
+The production dApp is not a static mock. It reads the deployed X Layer contracts and exposes these live operations:
+
+- `Trade`: real HookForge operation terminal for WOKB/USDC. Swap routing is only enabled once a permission-mined Uniswap v4 pool is deployed.
+- `Command`: deployed contract addresses, live metrics, module status, agent status, and real activity.
+- `Pools`: only registered pools backed by HookForge contract state.
+- `Studio`: module composition and operational state for the deployed adaptive pool.
+- `Modules`: live module registry and per-module contract pages.
+- `Agents`: funded server-agent wallets that can submit bounded HookKernel transactions from Vercel.
+- `Quests`: quest progress read from `QuestProgressed` events and `PoolStateManager`.
+- `Threats`: risk, volatility, whale pressure, and fee memory read directly from onchain metrics.
+- `Demo Lab`: runs the same real hook operations used by the terminal and agents.
 
 ## Safety Model
 
