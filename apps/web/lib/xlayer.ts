@@ -94,7 +94,7 @@ type RpcLog = {
   logIndex: string;
 };
 
-export type TerminalState = {
+export type HookLabState = {
   deployment: HookDeployment;
   moduleCount: number;
   modules: Array<(typeof MODULES)[number] & { hasCode: boolean; registryAddress?: string | null; enabled: boolean; gasLimit: number; order: number }>;
@@ -107,17 +107,6 @@ export type TerminalState = {
     token1: string;
     source: "PoolStateManager.getMetrics";
   };
-  agents: AgentStatus[];
-};
-
-export type AgentStatus = {
-  key: string;
-  name: string;
-  wallet: string | null;
-  balanceOkb: string | null;
-  mode: "server" | "user";
-  status: "ready" | "not-configured";
-  action: string;
 };
 
 export async function rpc<T>(method: string, params: unknown[], _revalidate = 20): Promise<T> {
@@ -311,41 +300,12 @@ export async function getModuleRegistryState() {
   };
 }
 
-export async function getAgents(): Promise<AgentStatus[]> {
-  const configuredWallets = [
-    envAddress("HOOKFORGE_AGENT_MEV_ADDRESS"),
-    envAddress("HOOKFORGE_AGENT_VOLATILITY_ADDRESS"),
-    envAddress("HOOKFORGE_AGENT_LIQUIDITY_ADDRESS"),
-    envAddress("HOOKFORGE_AGENT_GROWTH_ADDRESS")
-  ];
-  const labels = [
-    ["mev-defense", "MEV Defense Agent", "Runs beforeSwap checkpoints when toxic flow needs testing."],
-    ["volatility", "Volatility Agent", "Runs swap stress checkpoints and records metric changes."],
-    ["liquidity", "Liquidity Agent", "Runs LP checkpoint scenarios and watches liquidity health."],
-    ["growth", "Growth Agent", "Runs sentiment and quest checkpoints after adaptive swap activity."]
-  ] as const;
-  return Promise.all(labels.map(async ([key, name, action], index) => {
-    const wallet = configuredWallets[index];
-    const balance = wallet ? await rpc<string>("eth_getBalance", [wallet, "latest"]).catch(() => null) : null;
-    return {
-      key,
-      name,
-      wallet,
-      balanceOkb: balance ? formatEther(balance) : null,
-      mode: wallet ? "server" : "user",
-      status: wallet ? "ready" : "not-configured",
-      action
-    };
-  }));
-}
-
-export async function getTerminalState(): Promise<TerminalState> {
-  const [deployment, registry, activity, latestHex, agents] = await Promise.all([
+export async function getHookLabState(): Promise<HookLabState> {
+  const [deployment, registry, activity, latestHex] = await Promise.all([
     getHookDeployment(),
     getModuleRegistryState().catch(() => ({ moduleCount: 0, modules: MODULES.map((module, index) => ({ ...module, hasCode: false, registryAddress: null, enabled: false, gasLimit: 0, order: index + 1 })) })),
     getActivity(30).catch(() => []),
-    rpc<string>("eth_blockNumber", [], 8).catch(() => "0x0"),
-    getAgents().catch(() => [])
+    rpc<string>("eth_blockNumber", [], 8).catch(() => "0x0")
   ]);
 
   return {
@@ -360,8 +320,7 @@ export async function getTerminalState(): Promise<TerminalState> {
       token0: XLAYER.wokb,
       token1: XLAYER.usdc,
       source: "PoolStateManager.getMetrics"
-    },
-    agents
+    }
   };
 }
 
@@ -429,11 +388,4 @@ function decodeActivity(log: { address: string; topics: string[]; data: string; 
     };
   }
   return null;
-}
-
-function formatEther(hexWei: string) {
-  const wei = BigInt(hexWei);
-  const whole = wei / 10n ** 18n;
-  const fraction = (wei % 10n ** 18n).toString().padStart(18, "0").slice(0, 6);
-  return `${whole}.${fraction}`;
 }

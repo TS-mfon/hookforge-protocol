@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-export function ContractActions({ hookAddress }: { hookAddress: string | null }) {
+export function HookScenarioRunner({ hookAddress }: { hookAddress: string | null }) {
   const [account, setAccount] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,10 +80,10 @@ export function ContractActions({ hookAddress }: { hookAddress: string | null })
     <div className="rounded border border-forge-cyan/20 bg-black/28 p-5">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-forge-cyan">Live contract controls</p>
-          <h2 className="mt-2 text-xl font-semibold text-white">Run HookForge operations</h2>
+          <p className="text-xs uppercase tracking-[0.24em] text-forge-cyan">Hook scenarios</p>
+          <h2 className="mt-2 text-xl font-semibold text-white">Use the deployed hook</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-white/56">
-            These actions send real X Layer transactions to the deployed HookKernel and mutate the pool state read by the site.
+            Each scenario sends a real X Layer transaction to the deployed HookKernel and changes the adaptive pool state shown on this page.
           </p>
         </div>
         <button onClick={connect} className="inline-flex items-center gap-2 rounded border border-forge-cyan/30 bg-forge-cyan/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-forge-cyan/20">
@@ -95,7 +95,7 @@ export function ContractActions({ hookAddress }: { hookAddress: string | null })
       {!hookAddress && (
         <div className="mb-4 flex gap-3 rounded border border-forge-amber/30 bg-forge-amber/10 p-4 text-sm text-white/70">
           <ShieldAlert className="mt-0.5 h-4 w-4 flex-none text-forge-amber" />
-          Contract address is not configured. Deployment must be completed before write actions can run.
+          Contract address is not configured. The hook must be deployed before scenarios can run.
         </div>
       )}
 

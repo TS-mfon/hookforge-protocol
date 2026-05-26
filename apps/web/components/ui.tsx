@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight, CheckCircle2, ShieldAlert, Zap } from "lucide-react";
 import { evolutionLabel, metricThreat, type HookMetrics } from "@/lib/xlayer";
 
@@ -67,18 +66,18 @@ export function EmptyState({ title, copy }: { title: string; copy: string }) {
 export function CTA() {
   return (
     <div className="flex flex-wrap gap-3">
-      <Link href="/dashboard" className="inline-flex items-center gap-2 rounded bg-forge-cyan px-5 py-3 text-sm font-semibold text-black transition hover:bg-white">
-        Open Command Center <ArrowRight className="h-4 w-4" />
-      </Link>
-      <Link href="/demo-lab" className="inline-flex items-center gap-2 rounded border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-forge-green/50 hover:bg-white/8">
-        Run Demo Lab <Zap className="h-4 w-4 text-forge-green" />
-      </Link>
+      <a href="#use-hook" className="inline-flex items-center gap-2 rounded bg-forge-cyan px-5 py-3 text-sm font-semibold text-black transition hover:bg-white">
+        Use the hook <ArrowRight className="h-4 w-4" />
+      </a>
+      <a href="#proof" className="inline-flex items-center gap-2 rounded border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-forge-green/50 hover:bg-white/8">
+        View proof <Zap className="h-4 w-4 text-forge-green" />
+      </a>
     </div>
   );
 }
 
 export function SafetyList() {
-  const items = ["Emergency pause", "Module allowlist", "Gas ceilings", "Parameter caps", "X Layer tx receipts", "Explorer-linked actions", "No fake live values", "Explicit unavailable states"];
+  const items = ["Live X Layer receipts", "Wallet-triggered scenarios", "Dynamic fee response", "Risk and whale scoring", "Sentiment input", "LP hook accounting", "No fake trading claims", "v4 routing boundary shown"];
   return (
     <div className="grid gap-3 md:grid-cols-2">
       {items.map((item) => (
@@ -99,4 +98,3 @@ export function SecurityBadge() {
     </div>
   );
 }
-

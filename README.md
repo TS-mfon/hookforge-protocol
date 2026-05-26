@@ -1,16 +1,17 @@
 # HookForge Protocol
 
-**The Operating System for Adaptive Markets.**
+**A focused MVP for proving adaptive Uniswap v4 hook behavior.**
 
-HookForge is a modular behavioral layer for Uniswap v4 pools. It turns passive AMM liquidity into adaptive market organisms with dynamic fees, anti-MEV defenses, TWAP stability, AI recommendations, liquidity rebalancing, sentiment signals, whale intelligence, quests, LP RPG mechanics, and evolving pool states.
+HookForge helps pool creators show how a Uniswap v4-style hook can make a pool react to market conditions. The live dApp is intentionally simple: connect a wallet, run a hook scenario, and watch deployed X Layer contract state change.
 
-This repository is a greenfield monorepo containing:
+## What the MVP Demonstrates
 
-- A modern Next.js dApp and landing page.
-- Solidity contracts for the Hook Kernel and modules.
-- Shared schemas for pool state, modules, AI agents, and demo scenarios.
-- Live X Layer API routes for terminal state, activity, quests, modules, and agent execution.
-- Deployment scripts for GitHub and Vercel.
+- Dynamic fee response from swap pressure.
+- Whale/risk scoring from `beforeSwap`.
+- Sentiment-aware state updates from `afterSwap`.
+- LP protection/accounting from liquidity hook checkpoints.
+- Real X Layer receipts and explorer links for every hook action.
+- A clear boundary between the current hook-behavior proof and the next full routed Uniswap v4 pool deployment.
 
 ## Commands
 
@@ -22,30 +23,28 @@ npm run contracts:build
 npm run contracts:test
 ```
 
-## X Layer Mainnet Deployment Status
+## X Layer Mainnet Deployment
 
 Target network: X Layer mainnet, chain ID `196`.
 
-Official Uniswap v4 X Layer contracts used by the dApp:
-
-- PoolManager: `0x360e68faccca8ca495c1b759fd9eee466db9fb32`
-- PositionManager: `0xcf1eafc6928dc385a342e7c6491d371d2871458b`
-- StateView: `0x76fd297e2d437cd7f76d50f01afe6160f86e9990`
-- Universal Router: `0xda00ae15d3a71466517129255255db7c0c0956d3`
-- Permit2: `0x000000000022D473030F116dDEE9F6B43aC78BA3`
-
-Official X Layer token addresses used for the first HookForge pool target:
-
-- WOKB: `0xe538905cf8410324e03A5A23C1c177a474D59b2b`
-- USDC: `0x74b7F16337b8972027F6196A17a631aC6dE26d22`
-
-The deployer loaded from `buildenv/.env` resolves to:
+Uniswap v4 X Layer contracts referenced for the next routed-pool step:
 
 ```text
-0xEd9EDd8586b20524CafA4F568413C504C9B03172
+PoolManager       0x360e68faccca8ca495c1b759fd9eee466db9fb32
+PositionManager   0xcf1eafc6928dc385a342e7c6491d371d2871458b
+StateView         0x76fd297e2d437cd7f76d50f01afe6160f86e9990
+Universal Router  0xda00ae15d3a71466517129255255db7c0c0956d3
+Permit2           0x000000000022D473030F116dDEE9F6B43aC78BA3
 ```
 
-Current deployment on X Layer mainnet:
+First HookForge market target:
+
+```text
+WOKB  0xe538905cf8410324e03A5A23C1c177a474D59b2b
+USDC  0x74b7F16337b8972027F6196A17a631aC6dE26d22
+```
+
+Current HookForge deployment:
 
 ```text
 PoolStateManager      0x20e312df00bffd3a4270e4efa0d396d2d0afe603
@@ -55,18 +54,7 @@ EmergencyController   0x73784e99c0e183499da4d3e8002cbd6fdadc36b2
 HookKernel            0x622857b0fef3fc2adbed986194ab74eb624de5f7
 ```
 
-Core deployment transaction hashes:
-
-```text
-PoolStateManager      0xfe5e315c76660fc8eb2354402c1713906e8600819acfb92806679f3e682fbb60
-ModuleRegistry        0x9e7d413b48d2b22b822c8780360730493dfc8df7f5d8872efb2004c01a1e14ef
-ParameterManager      0xb0034fefab223743504e5ce898018e86dc210911319af05ebc5ae8d7872a7926
-EmergencyController   0xa70d4ce96084258afef04a8698a522350c87929ed6d20a124927e2f9cdf9dfe9
-HookKernel            0x5ea0789946213c0f466fc2c366295df0f488f43504c80d40dc95f354e97b4c4e
-StateManager.setKernel 0x1d182692c4fbf8afaf562df35cd600b4ea295aa2c12dab67f24fd0a5f08c2226
-```
-
-Deployed and configured modules:
+Deployed behavior modules:
 
 ```text
 DynamicFeeModule      0x7a2330a935b617ec257d8acb9c59e45cc2019bf5
@@ -81,62 +69,35 @@ QuestEngine           0xc437583f16e613b524f6607d81b628c5e5274f39
 LPProfileEngine       0xcf08ca0e9db390fcd5b5ef417b8a6d190d2a7288
 ```
 
-Onchain activity created for judge review:
+Recent proof transaction:
 
 ```text
-afterSwap checkpoint   0x6a3b48fd0462f9e9f5bcde3208bbbb71e92a6a37cea98fa0c3363b8f62f7628f
-beforeSwap checkpoint  0x25b1767005e11a65b5802ea14b973e35b6142866949a8bf72f59d1110aeb0aee
+Volatility hook scenario  0x2fae17075bb517510b287f26da7e195f697ae18957ee2fcd6b72234e09faf57d
 ```
 
-Funded server-agent wallets configured in Vercel production:
+## Live dApp
+
+Production URL:
 
 ```text
-MEV Defense Agent      0x7edAefb6cfaF03cE74e2A3f7D3860A90a325f316
-Volatility Agent       0x4595F50436C55824381D2530Fef941350aC1F6a2
-Liquidity Agent        0x509915128B3696F48707499C8786D0900FA6F606
-Growth Agent           0x9CEE7C9E40f2BF21C2C2A1715820bDf02af915be
+https://hookforge-protocol.vercel.app
 ```
 
-Current X Layer pool metrics after test activity:
+The app has one core flow:
 
-```text
-poolId          0x22222019d01322b7830e1d6572d2d9478cdab7c78471fa6b31eb73673595b244
-riskScore       0
-feeMemory       0
-liquidityHealth 75
-volatility      0
-sentiment       0
-whalePressure   0
-questProgress   4
-dynamicFeeBps   20
-evolutionState  1
-```
+1. Connect wallet on X Layer.
+2. Choose a hook scenario.
+3. Confirm the transaction.
+4. Watch the page refresh with live onchain metrics and receipt proof.
 
-Vercel production environment:
+## Next Step: Full Routed Uniswap v4 Swaps
 
-```text
-NEXT_PUBLIC_XLAYER_RPC_URL=https://rpc.xlayer.tech
-NEXT_PUBLIC_HOOKFORGE_KERNEL_ADDRESS=0x622857b0fef3fc2adbed986194ab74eb624de5f7
-NEXT_PUBLIC_HOOKFORGE_STATE_MANAGER_ADDRESS=0x20e312df00bffd3a4270e4efa0d396d2d0afe603
-NEXT_PUBLIC_HOOKFORGE_MODULE_REGISTRY_ADDRESS=0x4fe350f97542911ddc95ceb09510f61de05068d9
-HOOKFORGE_AGENT_*_ADDRESS=<public agent address>
-HOOKFORGE_AGENT_*_PRIVATE_KEY=<server-only private key>
-```
+The current MVP proves HookForge behavior through the deployed HookKernel. Full routed Uniswap v4 swapping needs one more deployment layer:
 
-## Live dApp Behavior
+1. Mine a Uniswap v4 hook address with the required callback permission bits.
+2. Deploy a v4 hook wrapper at that mined address.
+3. Initialize a WOKB/USDC v4 pool with `hooks = minedHookAddress`.
+4. Add initial liquidity through PositionManager.
+5. Replace scenario calls with Universal Router swap execution.
 
-The production dApp is not a static mock. It reads the deployed X Layer contracts and exposes these live operations:
-
-- `Trade`: real HookForge operation terminal for WOKB/USDC. Swap routing is only enabled once a permission-mined Uniswap v4 pool is deployed.
-- `Command`: deployed contract addresses, live metrics, module status, agent status, and real activity.
-- `Pools`: only registered pools backed by HookForge contract state.
-- `Studio`: module composition and operational state for the deployed adaptive pool.
-- `Modules`: live module registry and per-module contract pages.
-- `Agents`: funded server-agent wallets that can submit bounded HookKernel transactions from Vercel.
-- `Quests`: quest progress read from `QuestProgressed` events and `PoolStateManager`.
-- `Threats`: risk, volatility, whale pressure, and fee memory read directly from onchain metrics.
-- `Demo Lab`: runs the same real hook operations used by the terminal and agents.
-
-## Safety Model
-
-AI can recommend and, where configured, execute bounded actions. Every action is constrained by signed payloads, expiries, nonces, parameter caps, cooldowns, module allowlists, and emergency pause controls.
+The dApp does not fake swap routing before that pool exists.

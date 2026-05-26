@@ -17,51 +17,32 @@ export type HookOperation = {
   key: HookOperationKey;
   title: string;
   copy: string;
-  agent: "mev-defense" | "volatility" | "liquidity" | "growth";
   payload: bigint[];
 };
 
 export const hookOperations: HookOperation[] = [
   {
     key: "beforeSwap",
-    title: "MEV defense scan",
-    copy: "Runs BeforeSwap with TWAP deviation and whale-size inputs, raising risk and defensive fees when the flow is toxic.",
-    agent: "mev-defense",
+    title: "Whale defense check",
+    copy: "Runs beforeSwap with whale-size trade pressure so the hook raises risk, whale pressure, and defensive fees.",
     payload: [14n, 100n]
   },
   {
     key: "beforeSwap",
     title: "Volatility shock",
     copy: "Runs BeforeSwap with a high deviation input so TWAP, dynamic fee, and risk modules react onchain.",
-    agent: "volatility",
     payload: [32n, 100n]
   },
   {
     key: "afterSwap",
-    title: "Bullish sentiment close",
-    copy: "Runs AfterSwap with a positive sentiment signal, advancing quests and letting evolution logic recalculate state.",
-    agent: "growth",
+    title: "Sentiment update",
+    copy: "Runs afterSwap with a positive market signal so the hook records sentiment, advances activity, and recalculates fees.",
     payload: [90n]
   },
   {
-    key: "beforeAddLiquidity",
-    title: "LP safety preflight",
-    copy: "Runs the add-liquidity guard before capital enters the adaptive pool.",
-    agent: "liquidity",
-    payload: []
-  },
-  {
     key: "afterAddLiquidity",
-    title: "Update LP profile",
-    copy: "Runs LP RPG, rewards, rebalancing, and quest accounting after liquidity is added.",
-    agent: "liquidity",
-    payload: []
-  },
-  {
-    key: "beforeRemoveLiquidity",
-    title: "Liquidity exit defense",
-    copy: "Runs the defensive checkpoint before liquidity leaves the pool.",
-    agent: "liquidity",
+    title: "LP protection check",
+    copy: "Runs afterAddLiquidity so the hook updates LP accounting, reward signals, and pool health state.",
     payload: []
   }
 ];
