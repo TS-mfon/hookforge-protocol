@@ -120,12 +120,12 @@ export type AgentStatus = {
   action: string;
 };
 
-export async function rpc<T>(method: string, params: unknown[], revalidate = 20): Promise<T> {
+export async function rpc<T>(method: string, params: unknown[], _revalidate = 20): Promise<T> {
   const response = await fetch(XLAYER.rpcUrl, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-    next: { revalidate }
+    cache: "no-store"
   });
   if (!response.ok) throw new Error(`X Layer RPC returned ${response.status}`);
   const payload = await response.json() as { result?: T; error?: { message?: string } };
