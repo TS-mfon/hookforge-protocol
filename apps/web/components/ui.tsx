@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCircle2, ShieldAlert, Zap } from "lucide-react";
+import Link from "next/link";
 import { evolutionLabel, metricThreat, type HookMetrics } from "@/lib/xlayer";
 
 export function PageShell({ eyebrow, title, copy, children }: { eyebrow: string; title: string; copy: string; children: React.ReactNode }) {
@@ -66,12 +67,12 @@ export function EmptyState({ title, copy }: { title: string; copy: string }) {
 export function CTA() {
   return (
     <div className="flex flex-wrap gap-3">
-      <a href="#use-hook" className="inline-flex items-center gap-2 rounded bg-forge-cyan px-5 py-3 text-sm font-semibold text-black transition hover:bg-white">
+      <Link href="/use-hook" className="inline-flex items-center gap-2 rounded bg-forge-cyan px-5 py-3 text-sm font-semibold text-black transition hover:bg-white">
         Use the hook <ArrowRight className="h-4 w-4" />
-      </a>
-      <a href="#proof" className="inline-flex items-center gap-2 rounded border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-forge-green/50 hover:bg-white/8">
+      </Link>
+      <Link href="/proof" className="inline-flex items-center gap-2 rounded border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-forge-green/50 hover:bg-white/8">
         View proof <Zap className="h-4 w-4 text-forge-green" />
-      </a>
+      </Link>
     </div>
   );
 }

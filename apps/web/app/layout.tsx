@@ -31,9 +31,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </span>
               </Link>
               <nav className="hidden items-center gap-2 lg:flex">
-                <a href="#use-hook" className="rounded px-3 py-2 text-sm text-white/64 transition hover:bg-white/8 hover:text-white">Use hook</a>
-                <a href="#proof" className="rounded px-3 py-2 text-sm text-white/64 transition hover:bg-white/8 hover:text-white">Proof</a>
-                <a href="#v4-route" className="rounded px-3 py-2 text-sm text-white/64 transition hover:bg-white/8 hover:text-white">v4 route</a>
+                <Link href="/use-hook" className="rounded px-3 py-2 text-sm text-white/64 transition hover:bg-white/8 hover:text-white">Use hook</Link>
+                <Link href="/proof" className="rounded px-3 py-2 text-sm text-white/64 transition hover:bg-white/8 hover:text-white">Proof</Link>
+                <Link href="/v4-route" className="rounded px-3 py-2 text-sm text-white/64 transition hover:bg-white/8 hover:text-white">v4 route</Link>
               </nav>
               <WalletButton />
             </div>

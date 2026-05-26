@@ -111,6 +111,17 @@ export type HookLabState = {
   };
 };
 
+export type HookTxOutput = {
+  txHash: string;
+  status: "confirmed" | "failed" | "pending";
+  blockNumber: number | null;
+  explorerUrl: string;
+  events: ActivityEvent[];
+  metricsAfter: HookMetrics | null;
+  decodedSummary: string;
+  error?: string;
+};
+
 export async function rpc<T>(method: string, params: unknown[], _revalidate = 20): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -281,6 +292,43 @@ export async function getActivity(limit = 25): Promise<ActivityEvent[]> {
     .slice(0, limit);
 }
 
+export async function getHookTxOutput(txHash: string): Promise<HookTxOutput> {
+  if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+    throw new Error("Invalid transaction hash.");
+  }
+
+  const receipt = await rpc<{ status?: string; blockNumber?: string; logs?: RpcLog[] } | null>("eth_getTransactionReceipt", [txHash], 5);
+  if (!receipt) {
+    return {
+      txHash,
+      status: "pending",
+      blockNumber: null,
+      explorerUrl: explorerTx(txHash),
+      events: [],
+      metricsAfter: null,
+      decodedSummary: "X Layer has not returned a receipt for this transaction yet."
+    };
+  }
+
+  const status = receipt.status === "0x1" ? "confirmed" : "failed";
+  const events = (receipt.logs ?? [])
+    .map((log) => decodeActivity(log))
+    .filter((item): item is ActivityEvent => Boolean(item))
+    .sort((a, b) => a.logIndex - b.logIndex);
+  const deployment = await getHookDeployment();
+
+  return {
+    txHash,
+    status,
+    blockNumber: receipt.blockNumber ? hexToNumber(receipt.blockNumber) : null,
+    explorerUrl: explorerTx(txHash),
+    events,
+    metricsAfter: deployment.metrics,
+    decodedSummary: summarizeHookOutput(status, events),
+    error: status === "failed" ? "The transaction was mined but reverted or failed." : undefined
+  };
+}
+
 export async function getModuleRegistryState() {
   const countRaw = await rpc<string>("eth_call", [{ to: CONTRACTS.moduleRegistry, data: "0x334f7ac5" }, "latest"]);
   const moduleCount = Number(word(countRaw, 0));
@@ -340,7 +388,18 @@ function decodeMetrics(raw: string): HookMetrics {
   };
 }
 
-function decodeActivity(log: { address: string; topics: string[]; data: string; blockNumber: string; transactionHash: string; logIndex: string }): ActivityEvent | null {
+function summarizeHookOutput(status: "confirmed" | "failed" | "pending", events: ActivityEvent[]) {
+  if (status === "pending") return "Waiting for X Layer confirmation.";
+  if (status === "failed") return "The hook call did not commit state.";
+  const hookEvent = events.find((event) => event.name.startsWith("Hook checkpoint"));
+  const metricsEvent = events.find((event) => event.name === "Pool metrics updated");
+  if (hookEvent && metricsEvent) return `${hookEvent.name} executed and emitted updated pool metrics: ${metricsEvent.value}.`;
+  if (hookEvent) return `${hookEvent.name} executed on the deployed HookKernel.`;
+  if (events.length) return `${events.length} HookForge event${events.length === 1 ? "" : "s"} decoded from the receipt.`;
+  return "Transaction confirmed, but no HookForge events were decoded from this receipt.";
+}
+
+export function decodeActivity(log: { address: string; topics: string[]; data: string; blockNumber: string; transactionHash: string; logIndex: string }): ActivityEvent | null {
   const topic = log.topics[0];
   const blockNumber = hexToNumber(log.blockNumber);
   const logIndex = hexToNumber(log.logIndex);
