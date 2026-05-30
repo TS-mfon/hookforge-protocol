@@ -2,6 +2,9 @@
 
 **A live X Layer dApp for proving adaptive Uniswap v4 hook behavior.**
 
+Note: Officail account got suspended 
+Project updates will be sent with @Mfon_crypto on X
+
 HookForge is not a static DeFi dashboard. The current build is a focused, usable MVP that lets visitors connect a wallet, call a deployed hook kernel on X Layer mainnet, and inspect the real onchain output from that hook execution.
 
 The core idea is simple:
